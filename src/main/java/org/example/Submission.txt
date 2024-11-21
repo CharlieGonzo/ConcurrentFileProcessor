@@ -1,0 +1,169 @@
+https://github.com/CharlieGonzo/GarmentSimulator
+
+techniques I am going to practice today is multithreading and then for my second break I will work on my operating systems homework LOL.
+
+First I need to understand multithreading a little bit with the executor service pool
+
+Executor Service notes --------------------------------
+
+ExecutorService s a JDK API that simplifies running tasks asynchronously. Pretty much in simple terms it provides a pool of threas and  api to supply those threads a task.
+
+-Now there are different waits to instantiate ExecutorService. The first way being through the factory methods provided by the Executor Class. This is the easiest way to create a ExecutorService object.
+
+EXAMPLE:
+
+ExecutorService service = Executors.newFixedThreadPool(10);
+
+this code create a pool of 10 threads.
+
+ExecutoreService is an interface, so there are many different types of implementations of this interface. First example is the ThreadPoolExecutor class. that allows you to configure a eexcutor service.
+
+EXAMPLE:
+ExecutorService service = new ThreadPoolExecutor(1,,0l, TimeUnit.MILLISECONDS, new LinkedBlocakingQueue<Runnable>();
+
+so many configurations....
+
+but for most scenarios you will not need to make this many configs.
+
+- Now, it is time to see how to assign task to the ExecutorService
+
+ExcutoreService can execute Runnable and Callable tasks (gonna have to kook uop what Callable is. (Wait i think callabale is just a runnable with a return type duhhhhh).
+
+Example  of creating task for a thread pool.
+
+Runnable runnableTask  () -> {
+try{
+TimeUnit.MILLISECONDS.sleep(300)
+catch (InterruptedException e) {
+e.printStackTrace();
+}};
+
+Callable,String> callableTask () -> {
+TimeUnit.MILLISECONDS.sleep(300);
+return "Tasks's execution"
+};
+
+List<Callable<String>> callableTasks = new ArrayList<>(;
+callableTasks.add(callabletask);
+callableTasks.add(callabletask);
+callableTasks.add(callabletask);
+this code creates tasks
+
+Now how do we assign them?
+
+well ExecutoreService has several methods with an example being execute. This method is inherited from the Executore Interface, so it submit(), invokeAny(, and invokeAll();
+
+the execute() method is void so it does not have the possibility of retrieving the result from a task or to check its status
+
+ExecutoreServercie.execute(runnableTask);
+
+the submit() method is inserted into a future call and does return the result of a task. This cna be really useful when using the Callable Task.
+
+the invokeAny takes n a list of tasks and only runs one of them and then returns the result if there was a successful execution.
+
+the invokeAll() method takes in a list of tasks and  runs all of them. return all of the results in a list.
+
+When there are no task running on a ExecutoreService the service still is running waiting for work to do. This is a very useful feature as you don't need to spin upp methods everytime you need to do a multi-tasking task. However, at the end of application, the app could be stalled because when trying to close the JVM is still running the ExecutorService. So it is good practice to shut down the executoreservice on application close to prevent stalling.
+
+the code looks like this
+
+executorService.shutdown();
+
+the shutdownNow() method tries to destroy all tasks running before they finish while the previous method waits.
+
+List<Runnable> notExecutedTaks  executorService.shutDownNow();
+
+collect all of the remaining tasks that are not finished. 
+
+Now where were we..
+
+oh yeah, talking about shutting down the executor service.
+
+
+the submit() and InvokeAll() methods uses the future interface. This is because the user needs to have the ability to retrieve the results of the tasks being run when they are done. so a future.get will retrieve that for them.
+
+Example code:
+
+Future<String> future = executorService.submit(callableTask); // remember this method is like execute() but returns a value;
+
+String result = null;
+
+try{
+	result = future.get() // retreieve result when done
+} catch(Exception e){
+	System.out.println("error with retrieving result");
+}
+
+This code above is an example of retrieving the results from a task and storing it into a variable
+
+
+With the future interface you can set a timelimit on the get request if the get request is not important.
+
+example code:
+ String result = future.get(200,TimeUnit.MILLISECONDS);
+//this has a time limit of .2 seconds and throws a TimeoutException if get request is not completed.
+
+Now we are getting fancy, the next interface we are going to talk about is the ScheduledExecutorService. This interface run tasks after a predefinied time.
+
+The best way to instantiate is the same way as with the Executor class. Through factory methods. 
+
+Example of creating one thread for scheduledExecutorService:
+
+
+ScheduleExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+to schedule a task after a fixed delay. We can use the scheduled() methods.This method can both run Runnable and Callable task/
+
+Example code:
+
+Future<String> resultFuture = executorService.schedule(callableTask,1,TimeUnit.SECONDS);//this method uses the future APi to retrieve the results of this task which is being delayed by one second before starting.
+
+now what about a task that you want to keep repeating?
+
+Example code:
+
+executorService.scheduleAtFixedRate(runnableTask, 100, 450, TimeUnit.MILLISECONDS);
+
+There is also a another method called scheduleWithFixedDelay() this method is used for starting the timer of execution after the task is complete. With the previous method, if the task doesn't finish within the time frame, the next iteration of the task has to wait for the original task to complete, possibly causing some congestive issues.
+
+what are the pitfalls of the executor service? well lets start with the resources being allocated to the service. When the ExecutorService stalls, it holds on to precious resources and does not let them go unless told to do so. Another pitfall with ExecutorService is the prediction of the amount of threads that you'll need.
+Too large of a thread pool will cause an overhead and threads will most likely be in waiting mode was4ting resources. Too few though can make an application unresponsive causing long waiting periods for tasks in a queue.
+THe long blocking and complexity caused buy the future API is also another anooying ascpect of the Executor Service.
+
+Well this will be the end of that article on Executor Services. Am I good enough now
+
+Public Class App{
+
+public static void main(String[] args){
+	ExectuorService service = Exectuore.newFixedThreadPool(10);
+	File file1 = new File("file location");
+	File file2 = new File("file location");
+	File file3 = new File("file location");
+
+	Runnable fileOneRead = () - > {
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
